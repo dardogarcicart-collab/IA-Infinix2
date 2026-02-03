@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Infinix AI - Sistema Avanzado de Inteligencia Artificial para Matemáticas, Física, Química y Programación">
-    <meta name="author" content="Tu Nombre">
-    <title>Infinix AI - Sistema Avanzado</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Infinix AI v4 - Sistema Avanzado de Inteligencia Artificial">
+    <meta name="author" content="Infinix Team">
+    <meta name="theme-color" content="#ff3333">
+    <title>Infinix AI v4</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <!-- Pantalla de carga -->
@@ -47,7 +48,7 @@
                 <circle cx="15" cy="50" r="5" fill="#ff3333"/>
             </svg>
             <h1 id="aiName">⚡ Infinix-4</h1>
-            <p id="aiEngine">Powered by Infinix 4 Ultra AI Engine</p>
+            <p id="aiEngine">Powered by Infinix 4 AI Engine</p>
             <div class="header-actions">
                 <button id="toggleTheme" aria-pressed="false" aria-label="Cambiar tema">🌙</button>
                 <button id="openHistory" aria-label="Mostrar historial">📚</button>
@@ -75,11 +76,11 @@
                 <span class="stat-value" id="versionLabel">Infinix 4</span>
                 <span>Versión</span>
             </div>
-        </div>
+        </aside>
 
         <!-- Temporizador de prueba -->
         <div class="trial-timer" id="trialTimer" role="timer" aria-live="polite">
-            ⏱️ Prueba de Infinix 6: <span id="timeRemaining">10:00</span> restantes
+            ⏱️ Prueba: <span id="timeRemaining">10:00</span> restantes
         </div>
 
         <!-- Barra de herramientas matemáticas -->
@@ -90,13 +91,8 @@
             <button class="tool-btn" onclick="insertarFuncion('tan(')" aria-label="Tangente">tan</button>
             <button class="tool-btn" onclick="insertarFuncion('log(')" aria-label="Logaritmo">log</button>
             <button class="tool-btn" onclick="insertarFuncion('ln(')" aria-label="Logaritmo natural">ln</button>
-            <button class="tool-btn" onclick="mostrarFraccion()" aria-label="Fracciones">⁄</button>
-            <button class="tool-btn" onclick="insertarFuncion('(')" aria-label="Paréntesis">( )</button>
             <button class="tool-btn" onclick="insertarFuncion('^')" aria-label="Potencia">xⁿ</button>
             <button class="tool-btn" onclick="insertarFuncion('π')" aria-label="Pi">π</button>
-            <button class="tool-btn" onclick="insertarFuncion('e')" aria-label="Número de Euler">e</button>
-            <button class="tool-btn" onclick="resolverEcuacion()" aria-label="Resolver ecuación">Ec.</button>
-            <button class="tool-btn" onclick="generarGrafica()" aria-label="Generar gráfica">📊</button>
             <button class="tool-btn" onclick="limpiarChat()" aria-label="Limpiar chat">🗑️</button>
         </nav>
 
@@ -114,83 +110,60 @@
                 autocomplete="off"
             />
             <button onclick="sendMessage()" aria-label="Enviar mensaje">Enviar</button>
-        </footer>
-    </div>
-
-    <!-- Modal de gráfica -->
+        </footer>aquí..." 
+                aria-label="Campo de entrada"
+                autocomplete="off"
+            />s -->
     <div id="graphModal" class="graph-modal" role="dialog" aria-hidden="true">
         <div class="graph-content" role="document">
             <button id="closeGraph" class="graph-close" aria-label="Cerrar gráfica">✕</button>
             <div class="graph-header">
                 <label for="graphExpr">f(x) = </label>
-                <input id="graphExpr" type="text" placeholder="ej: x^2 or sin(x)" aria-label="Expresión de la función" />
+                <input id="graphExpr" type="text" placeholder="ej: x^2 or sin(x)" aria-label="Expresión" />
                 <button id="plotBtn">Graficar</button>
             </div>
-            <canvas id="graphCanvas" width="800" height="360" aria-label="Gráfica de la función"></canvas>
-            <div class="graph-controls">
-                <label>Rango X: <input id="xMin" type="number" value="-10" step="1"/> a <input id="xMax" type="number" value="10" step="1"/></label>
-                <button id="autoScale">Auto</button>
-            </div>
+            <canvas id="graphCanvas" width="800" height="360" aria-label="Gráfica"></canvas>
         </div>
     </div>
 
-    <!-- Modal de código generado -->
+    <!-- Modal de código -->
     <div id="codeModal" class="code-modal" role="dialog" aria-hidden="true">
         <div class="code-content" role="document">
             <button id="closeCode" class="code-close" aria-label="Cerrar código">✕</button>
             <div class="code-header">
-                <h2 id="codeLang">Código generado</h2>
+                <h2 id="codeLang">Código</h2>
                 <button id="copyCodeBtn">📋 Copiar</button>
             </div>
             <pre><code id="codeBlock" class="code-block"></code></pre>
         </div>
     </div>
 
-    <!-- Modal de login -->
-    <div id="loginModal" class="login-modal" role="dialog" aria-hidden="true">
-        <div class="login-content" role="document">
-            <h2>Iniciar sesión</h2>
-            <label for="loginUser">Usuario</label>
-            <input id="loginUser" type="text" placeholder="usuario" />
-            <label for="loginPass">Contraseña</label>
-            <input id="loginPass" type="password" placeholder="contraseña" />
-            <div style="margin-top:10px; display:flex; gap:8px;">
-                <button id="loginBtn">Iniciar sesión</button>
-                <button id="loginCancel">Cancelar</button>
-            </div>
-            <p style="font-size:12px; opacity:0.8; margin-top:8px;">Cuenta demo: usuario <strong>demo</strong>, contraseña <strong>demo</strong></p>
-        </div>
-    </div>
+    <!-- Scripts en orden correcto -->
+    <!-- 1. Core -->
+    <script src="js/config.js"></script>
+    <script src="js/logger.js"></script>
+    
+    <!-- 2. Sistemas avanzados -->
+    <script src="js/plugins_system.js"></script>
+    <script src="js/user_profiles.js"></script>
+    <script src="js/rules_engine.js"></script>
+    <script src="js/learning_system.js"></script>
+    
+    <!-- 3. IA y generación -->
+    <script src="js/ai_engine.js"></script>
+    <script src="js/code_generator.js"></script>
+    
+    <!-- 4. Debug y principal -->
+    <script src="js/debug_panel.js"></script>
+    <script src="js/script.js"></script>
 
-    <!-- Core modules (foundation) -->
-    <script src="src/core/config.js"></script>
-    <script src="src/core/logger.js"></script>
-    <script src="src/core/auth.js"></script>
-    <script src="src/core/language_analyzer.js"></script>
-    <script src="src/core/personality.js"></script>
-    
-    <!-- Advanced features (building blocks) -->
-    <script src="src/plugins/plugins_system.js"></script>
-    <script src="src/plugins/user_profiles.js"></script>
-    <script src="src/core/rules_engine.js"></script>
-    <script src="src/core/learning_system.js"></script>
-    
-    <!-- AI engines -->
-    <script src="src/ai/ai_engine.js"></script>
-    <script src="src/ai/code_generator.js"></script>
-    
-    <!-- Main application -->
-    <script src="script.js"></script>
-    
-    <!-- Developer tools -->
-    <script src="src/tools/debug_panel.js"></script>
-    
-    <!-- Debug shortcuts -->
+    <!-- Inicializar cuando el DOM esté listo -->
     <script>
-        // Mostrar panel de debug con Ctrl+D
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key.toLowerCase() === 'd'){
-                e.preventDefault();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarApp);
+        } else {
+            inicializarApp();
+        }     e.preventDefault();
                 DebugPanel?.toggle?.();
             }
         });
