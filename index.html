@@ -146,9 +146,27 @@
         </div>
     </div>
 
+    <!-- Modal de login -->
+    <div id="loginModal" class="login-modal" role="dialog" aria-hidden="true">
+        <div class="login-content" role="document">
+            <h2>Iniciar sesión</h2>
+            <label for="loginUser">Usuario</label>
+            <input id="loginUser" type="text" placeholder="usuario" />
+            <label for="loginPass">Contraseña</label>
+            <input id="loginPass" type="password" placeholder="contraseña" />
+            <div style="margin-top:10px; display:flex; gap:8px;">
+                <button id="loginBtn">Iniciar sesión</button>
+                <button id="loginCancel">Cancelar</button>
+            </div>
+            <p style="font-size:12px; opacity:0.8; margin-top:8px;">Cuenta demo: usuario <strong>demo</strong>, contraseña <strong>demo</strong></p>
+        </div>
+    </div>
+
     <!-- Core modules (foundation) -->
-    <script src="config.js"></script>
-    <script src="logger.js"></script>
+    <script src="src/core/config.js"></script>
+    <script src="src/core/logger.js"></script>
+    <script src="src/core/auth.js"></script>
+    <script src="src/core/language_analyzer.js"></script>
     
     <!-- Advanced features (building blocks) -->
     <script src="plugins_system.js"></script>
@@ -157,8 +175,8 @@
     <script src="learning_system.js"></script>
     
     <!-- AI engines -->
-    <script src="ai_engine.js"></script>
-    <script src="code_generator.js"></script>
+    <script src="src/ai/ai_engine.js"></script>
+    <script src="src/ai/code_generator.js"></script>
     
     <!-- Main application -->
     <script src="script.js"></script>

@@ -136,6 +136,13 @@ function inicializarApp() {
             timestamp: new Date().toISOString()
         });
     }
+
+    // Si no autenticado, mostrar modal de login
+    if (typeof Auth !== 'undefined' && !Auth.isAuthenticated()){
+        // bloquear interacciones hasta login
+        Auth.requireLogin();
+        addMessage('Acceso bloqueado: por favor inicia sesión para usar Infinix AI', 'system');
+    }
     
     // Event listeners
     elementos.userInput.addEventListener('keypress', (e) => {
@@ -415,6 +422,12 @@ function sendMessage() {
     const mensaje = elementos.userInput.value.trim();
     
     if (mensaje === '') return;
+    // Verificar autenticación
+    if (typeof Auth !== 'undefined' && !Auth.isAuthenticated()){
+        addMessage('Acceso BLOQUEADO: inicia sesión para enviar mensajes.', 'system');
+        Auth.requireLogin();
+        return;
+    }
     
     // Verificar límite de Infinix 6
     if (state.versionActual === 6) {
@@ -439,9 +452,54 @@ function sendMessage() {
     processUserMessage(mensaje);
 }
 
+// Cambiar versión y aplicar reglas de acceso Infinix
+function cambiarVersion(v){
+    // v = 3,4,6
+    if (v === 4){
+        // visible pero no usable
+        addMessage('Infinix 4: Disponible próximamente. Redirigiendo a Infinix 3.', 'system');
+        state.versionActual = 3;
+        elementos.versionLabel.textContent = 'Infinix 3 (limitado)';
+        return;
+    }
+    if (v === 6){
+        addMessage('Infinix 6: Acceso restringido. Redirigiendo a Infinix 3.', 'system');
+        state.versionActual = 3;
+        elementos.versionLabel.textContent = 'Infinix 3 (limitado)';
+        return;
+    }
+    // default: set to 3
+    state.versionActual = 3;
+    elementos.versionLabel.textContent = 'Infinix 3';
+}
+
 /** Procesa el mensaje del usuario con análisis y respuesta humana-simulada */
 function processUserMessage(mensaje){
+    // análisis semántico y de intención
     const analysis = analyzeMessage(mensaje);
+    const langContext = {
+        authUser: Auth?.getUser?.(),
+        versionInfinix: state.versionActual,
+        tokensDisponibles: state.tokensDisponibles || 0,
+        complejidadPermitida: state.complejidadPermitida || 0.4,
+        permisoAvanzado: Auth?.getUser?.()?.permisoAvanzado || false
+    };
+    const langEval = typeof LanguageAnalyzer !== 'undefined' ? LanguageAnalyzer.evaluate(mensaje, langContext) : null;
+    if (langEval){
+        state.idiomaDetectado = langEval.idiomaDetectado;
+        state.intencionDetectada = langEval.intencionDetectada;
+        state.estadoAcceso = langEval.estadoAcceso;
+        // Si bloqueado, enviar respuesta fija y detener pipeline
+        if (langEval.isBlocked){
+            addMessage(langEval.fixedMessage || 'Acceso restringido.', 'system');
+            return;
+        }
+        // Si requiere carga, enviar mensaje fijo
+        if (langEval.requiereCarga){
+            addMessage(langEval.fixedMessage || 'Esta función requiere carga adicional.', 'system');
+            return;
+        }
+    }
     
     // Log el análisis del mensaje
     if (typeof Logger !== 'undefined'){

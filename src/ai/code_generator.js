@@ -14,7 +14,7 @@
         riesgoError: 0.1,
 
         // Lenguajes soportados
-        LENGUAJES: ['javascript', 'java', 'python', 'cpp', 'html', 'css'],
+        LENGUAJES: ['javascript', 'java', 'python', 'cpp', 'html', 'css', 'lua'],
 
         // Analizar una petición de usuario para detectar si quiere código
         analizarPeticion(texto){
@@ -24,6 +24,7 @@
                 java: /\bjava\b|\.jar|public class|main\(/i,
                 javascript: /\bjs\b|javascript|async|await|const |let |var /i,
                 python: /\bpython\b|\.py\b|def |import |async |await /i,
+                lua: /\blua\b|\.lua\b|function\s+\w+\s*\(|local\s+/i,
                 cpp: /c\+\+|\bcpp\b|#include|std::|cout|cin/i,
                 html: /\bhtml\b|<div|<html|<head|<body|<!doctype/i,
                 modificar: /modifica|edita|cambia|mejora|optimiza|refactoriza/i,
@@ -228,6 +229,16 @@ public class ${nombreClase} {
         System.out.println(prog.procesar());
     }
 }`;
+            return code;
+        },
+
+        generarLua(analisis, desc, conceptos){
+            let code = `-- Código Lua generado automáticamente\n-- ${analisis.descripcion}\n\n`;
+            if (conceptos.includes('funcion') || desc.includes('función') || desc.includes('funcion')){
+                code += `local function procesar(entrada)\n    if type(entrada) ~= 'table' then error('Entrada inválida') end\n    local resultado = { entrada = entrada, procesado = true, timestamp = os.time() }\n    return resultado\nend\n\n-- uso\nlocal res = procesar({valor=42})\nprint(require('inspect') and inspect(res) or tostring(res))`;
+            } else {
+                code += `-- Ejemplo simple\nlocal M = {}\nfunction M.saludar(name)\n    return 'Hola '..(name or 'mundo')\nend\n\nprint(M.saludar('Infinix'))`;
+            }
             return code;
         },
 
