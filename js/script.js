@@ -137,13 +137,6 @@ function inicializarApp() {
         });
     }
 
-    // Si no autenticado, mostrar modal de login
-    if (typeof Auth !== 'undefined' && !Auth.isAuthenticated()){
-        // bloquear interacciones hasta login
-        Auth.requireLogin();
-        addMessage('Acceso bloqueado: por favor inicia sesión para usar Infinix AI', 'system');
-    }
-    
     // Event listeners
     elementos.userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
@@ -459,12 +452,6 @@ function sendMessage() {
     const mensaje = elementos.userInput.value.trim();
     
     if (mensaje === '') return;
-    // Verificar autenticación
-    if (typeof Auth !== 'undefined' && !Auth.isAuthenticated()){
-        addMessage('Acceso BLOQUEADO: inicia sesión para enviar mensajes.', 'system');
-        Auth.requireLogin();
-        return;
-    }
     
     // Verificar límite de Infinix 6
     if (state.versionActual === 6) {
