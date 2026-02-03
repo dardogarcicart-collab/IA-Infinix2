@@ -204,13 +204,50 @@ function inicializarApp() {
         elementos.mainInterface.classList.add('visible');
         
         const palabra = obtenerPalabraAleatoria();
+        const nick = Personality?.getNickname?.();
+        const saludo = nick ? `${palabra}, ${nick}!` : `${palabra}!`;
         addMessage(
-            `${palabra}! Soy Infinix-4, tu IA más avanzada.\n\n` +
+            `${saludo} Soy Infinix-4, tu IA más avanzada.\n\n` +
             `📊 Matemáticas | ⚛️ Física | 🧪 Química | 💻 Programación\n\n` +
             `¿En qué puedo ayudarte?`,
             'ai'
         );
     }, CONFIG.LOADING_DURATION);
+}
+
+// Manejar comandos de usuario directos (apodo, personalidad, memoria)
+function handleUserCommands(text){
+    const lower = text.toLowerCase();
+    // llámame X  -> establecer apodo
+    const match = lower.match(/ll(?:á|a)mame\s+([\w\-]+)/i);
+    if (match){
+        const nick = match[1];
+        Personality.setNickname(nick);
+        addMessage(`Listo — te llamaré ${nick} a partir de ahora.`, 'system');
+        return true;
+    }
+    if (/olvida mi apodo|olvida mi apodo|borra mi apodo/i.test(lower)){
+        Personality.forgetNickname();
+        addMessage('He olvidado tu apodo.', 'system');
+        return true;
+    }
+    // cambiar personalidad a X
+    const pMatch = lower.match(/cambiar personalidad (?:a )?([a-z]+)/i) || lower.match(/set persona to ([a-z]+)/i);
+    if (pMatch){
+        const p = pMatch[1];
+        if (Personality.setPersonality(p)){
+            addMessage(`Personalidad cambiada a ${p}.`, 'system');
+        } else {
+            addMessage(`Personalidad desconocida. Opciones: ${Personality.listPersonalities().join(', ')}`, 'system');
+        }
+        return true;
+    }
+    if (/mostrar memoria|ver memoria|mostrar mi memoria/i.test(lower)){
+        const mem = Personality.getMemory();
+        addMessage(`Memoria: ${JSON.stringify(mem)}`, 'system');
+        return true;
+    }
+    return false;
 }
 
 // ===== Funciones de utilidad =====
