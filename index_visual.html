@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Infinix AI - Visual</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="visual.css">
+</head>
+<body>
+  <header class="header-visual">
+    <svg width="48" height="48" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="#4cc9f0" fill="none" stroke-width="4"/></svg>
+    <div>
+      <h1>Infinix AI — Visual</h1>
+      <div class="controls-visual">
+        <div id="aiStatus" class="status-pill">Estado: calm</div>
+        <div class="ai-thinking" id="aiEnergy">E: 0.8</div>
+        <div class="indicator-thinking" aria-hidden="true"></div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section style="display:flex; gap:12px;">
+      <div style="flex:1;">
+        <div id="chatContainer" class="chat-container"></div>
+        <footer class="input-area" style="margin-top:10px; display:flex; gap:8px;">
+          <input id="userInput" type="text" placeholder="Escribe tu mensaje..." autocomplete="off">
+          <button onclick="sendMessage()">Enviar</button>
+          <button onclick="document.getElementById('userInput').value='sin(x)';">Ejemplo</button>
+        </footer>
+      </div>
+      <aside style="width:320px;">
+        <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:10px;">
+          <h3>IA Core</h3>
+          <div id="aiMetrics">Cargando métricas...</div>
+          <div style="margin-top:8px;"><button onclick="AIEngine && AIEngine.init()">Reiniciar AI Engine</button></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="ai_engine.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Conectar visual UI con AIEngine si disponible
+    function refreshAIMetrics(){
+      const el = document.getElementById('aiMetrics');
+      if (!window.AIEngine) return el.textContent='AIEngine no cargado';
+      el.innerHTML = `carga: ${AIEngine.cargaCognitiva.toFixed(2)}<br>entropía: ${AIEngine.entropiaInterna.toFixed(2)}<br>razonamiento: ${AIEngine.nivelRazonamiento.toFixed(2)}<br>fatiga: ${AIEngine.fatigaIA.toFixed(2)}`;
+      const status = document.getElementById('aiStatus');
+      status.textContent = 'Estado: ' + (state.estadoMental || 'calm');
+      const energy = document.getElementById('aiEnergy');
+      energy.textContent = 'E: ' + (state.energiaIA||0).toFixed(2);
+    }
+    setInterval(()=>{ refreshAIMetrics(); }, 900);
+  </script>
+</body>
+</html>

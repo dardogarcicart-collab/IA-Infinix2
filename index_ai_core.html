@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Infinix AI - Core</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main style="padding:18px;">
+    <h1>Infinix AI — Core Logic</h1>
+    <p>Interfaz minimal que expone métricas y permite probar flujo lógico.</p>
+    <div id="chatContainer" class="chat-container" style="max-height:40vh;margin-bottom:12px;"></div>
+    <div style="display:flex; gap:8px;">
+      <input id="userInput" type="text" placeholder="Escribe...">
+      <button onclick="sendMessage()">Enviar</button>
+      <button onclick="console.log(state); alert(JSON.stringify(state, null, 2))">Ver estado</button>
+    </div>
+    <pre id="engineOut" style="margin-top:12px; background:#0008; padding:10px; border-radius:6px;"></pre>
+  </main>
+  <script src="ai_engine.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // mostrar métricas del engine cuando cambian
+    setInterval(()=>{
+      if (!window.AIEngine) return document.getElementById('engineOut').textContent = 'AIEngine no cargado';
+      const m = AIEngine.computeDecisionMetrics({complexity:0.6});
+      document.getElementById('engineOut').textContent = JSON.stringify({ai:AIEngine, metrics:m, state:state}, ['cargaCognitiva','entropiaInterna','nivelRazonamiento','factorAleatoriedad','coherenciaGlobal','fatigaIA','profundidadScore','expectedTime','decisionEntropy'],2);
+    }, 1200);
+  </script>
+</body>
+</html>

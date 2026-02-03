@@ -1,0 +1,15 @@
+/* Visual enhancements for index_visual.html */
+:root{ --accent:#4cc9f0; --accent-2:#4361ee; --glass: rgba(255,255,255,0.06); }
+body{ background: radial-gradient(circle at 10% 10%, #071345 0%, #020617 40%, #000000 100%); color: #dbeafe; }
+.header-visual{ display:flex; align-items:center; gap:12px; padding:18px; border-bottom:1px solid rgba(255,255,255,0.03); }
+.status-pill{ padding:6px 10px; border-radius:20px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#001; font-weight:700; box-shadow:0 6px 18px rgba(67,97,238,0.15); }
+.ai-thinking{ position:relative; }
+.ai-thinking::after{ content:''; position:absolute; right:-28px; top:8px; width:10px; height:10px; border-radius:50%; background:#ffd166; box-shadow: 0 0 10px #ffd166; animation: pulse 1.2s infinite; }
+@keyframes pulse{ 0%{ transform:scale(1); opacity:1 }50%{ transform:scale(1.4); opacity:0.6 }100%{ transform:scale(1); opacity:1 } }
+.chat-container{ max-height:60vh; overflow:auto; backdrop-filter: blur(6px); border-radius:12px; border:1px solid rgba(255,255,255,0.03); padding:12px; }
+.message-bubble{ transition: transform .18s ease, box-shadow .18s ease; }
+.message.ai .message-bubble{ animation: slideIn .28s ease; }
+@keyframes slideIn{ from{ transform: translateY(6px); opacity:0 } to{ transform: translateY(0); opacity:1 } }
+.indicator-thinking{ height:6px; width:80px; background: linear-gradient(90deg,#ffd166,#ff7b7b); border-radius:6px; animation: thinkBar 1.6s infinite; }
+@keyframes thinkBar{ 0%{ transform:scaleX(0.2) } 50%{ transform:scaleX(1) } 100%{ transform:scaleX(0.2) } }
+.controls-visual{ display:flex; gap:10px; align-items:center; }

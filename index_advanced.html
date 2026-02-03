@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Infinix AI - Advanced</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="visual.css">
+  <style>
+    /* extras experimentales */
+    .entropy-spark{ width:100%; height:40px; background:linear-gradient(90deg,#ff7b7b, #ffd166); border-radius:6px; margin-top:8px; box-shadow:0 8px 30px rgba(255,123,123,0.08); }
+  </style>
+</head>
+<body>
+  <header class="header-visual">
+    <h1>Infinix AI — Advanced (Experimental)</h1>
+  </header>
+  <main>
+    <section>
+      <div id="chatContainer" class="chat-container" style="max-height:55vh;"></div>
+      <footer class="input-area">
+        <input id="userInput" type="text" placeholder="Pregunta o ecuación...">
+        <button onclick="sendMessage()">Enviar</button>
+        <button onclick="AIEngine && (AIEngine.entropiaInterna=Math.min(1,AIEngine.entropiaInterna+0.1))">+Entropía</button>
+      </footer>
+      <div style="padding:12px; display:flex; gap:8px;">
+        <div style="flex:1; background:rgba(255,255,255,0.02); padding:8px; border-radius:8px;">Decisiones: <span id="decisions"></span></div>
+        <div class="entropy-spark" id="spark"></div>
+      </div>
+    </section>
+  </main>
+  <script src="ai_engine.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // mostrar decisión ejemplo cada 2s
+    setInterval(()=>{
+      if (!window.AIEngine) return;
+      const opts = [{label:'corto',score:1},{label:'largo',score:1.2},{label:'caos',score:0.5}];
+      const pick = AIEngine.decideWeighted(opts);
+      document.getElementById('decisions').textContent = pick.label + ' (' + pick.score + ')';
+      document.getElementById('spark').style.opacity = (AIEngine.entropiaInterna).toFixed(2);
+    }, 1500);
+  </script>
+</body>
+</html>
