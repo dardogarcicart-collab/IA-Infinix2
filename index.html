@@ -3,101 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Infinix AI v4 - Sistema Avanzado de Inteligencia Artificial">
+    <meta name="description" content="Infinix AI v4 - IA Conversacional Avanzada">
     <meta name="author" content="Infinix Team">
-    <meta name="theme-color" content="#ff3333">
-    <title>Infinix AI v4</title>
+    <meta name="theme-color" content="#10a37f">
+    <title>Infinix AI</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <!-- Pantalla de carga -->
-    <div id="loading-screen">
-        <svg class="ram-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="#ff3333" stroke-width="6"/>
-            <circle cx="50" cy="50" r="8" fill="#ff3333"/>
-            <line x1="50" y1="50" x2="50" y2="15" stroke="#ff3333" stroke-width="4"/>
-            <line x1="50" y1="50" x2="85" y2="50" stroke="#ff3333" stroke-width="4"/>
-            <line x1="50" y1="50" x2="50" y2="85" stroke="#ff3333" stroke-width="4"/>
-            <line x1="50" y1="50" x2="15" y2="50" stroke="#ff3333" stroke-width="4"/>
-            <circle cx="50" cy="15" r="5" fill="#ff3333"/>
-            <circle cx="85" cy="50" r="5" fill="#ff3333"/>
-            <circle cx="50" cy="85" r="5" fill="#ff3333"/>
-            <circle cx="15" cy="50" r="5" fill="#ff3333"/>
-            <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="2s" repeatCount="indefinite"/>
-        </svg>
-        <div class="loading-text">Cargando la RAM</div>
-        <div class="loading-bar">
-            <div class="loading-progress"></div>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-container">
+            <svg class="loading-spinner" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="6"/>
+                <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                <circle cx="50" cy="15" r="5" fill="currentColor">
+                    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+            <div class="loading-text">Iniciando Infinix AI...</div>
         </div>
     </div>
 
-    <!-- Interfaz principal: contenedor principal con header, aside (stats), main (chat) y footer (entrada) -->
-    <div id="main-interface">
-        <!-- Header -->
-        <header class="header">
-            <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#ff3333" stroke-width="6"/>
-                <circle cx="50" cy="50" r="8" fill="#ff3333"/>
-                <line x1="50" y1="50" x2="50" y2="15" stroke="#ff3333" stroke-width="4"/>
-                <line x1="50" y1="50" x2="85" y2="50" stroke="#ff3333" stroke-width="4"/>
-                <line x1="50" y1="50" x2="50" y2="85" stroke="#ff3333" stroke-width="4"/>
-                <line x1="50" y1="50" x2="15" y2="50" stroke="#ff3333" stroke-width="4"/>
-                <circle cx="50" cy="15" r="5" fill="#ff3333"/>
-                <circle cx="85" cy="50" r="5" fill="#ff3333"/>
-                <circle cx="50" cy="85" r="5" fill="#ff3333"/>
-                <circle cx="15" cy="50" r="5" fill="#ff3333"/>
-            </svg>
-            <h1 id="aiName">⚡ Infinix-4</h1>
-            <p id="aiEngine">Powered by Infinix 4 AI Engine</p>
-            <div class="header-actions">
-                <button id="toggleTheme" aria-pressed="false" aria-label="Cambiar tema">🌙</button>
-                <button id="openHistory" aria-label="Mostrar historial">📚</button>
+    <!-- Interfaz Principal (tipo ChatGPT) -->
+    <div id="main-interface" class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="menu-btn" id="menuBtn" aria-label="Menú">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <h1 class="app-title">Infinix AI</h1>
+                </div>
+                <div class="header-right">
+                    <span class="personality-badge" id="personalityBadge">neutral</span>
+                    <button id="toggleTheme" class="icon-btn" aria-label="Cambiar tema" title="Tema">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                    </button>
+                    <button id="settingsBtn" class="icon-btn" aria-label="Configuración" title="Configuración">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m2.12-2.12l4.24-4.24M19.78 4.22l-4.24 4.24m-2.12 2.12l-4.24 4.24M23 12h-6m-6 0H5M19.78 19.78l-4.24-4.24m-2.12-2.12l-4.24-4.24"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            
-            <!-- Selector de versión -->
-            <nav class="version-selector" role="navigation" aria-label="Selector de versión">
-                <button class="version-btn active" onclick="cambiarVersion(4)" aria-pressed="true">Infinix 4 ✅</button>
-                <button class="version-btn" onclick="cambiarVersion(5)" aria-pressed="false">Fanix 5 ✅</button>
-                <button class="version-btn" onclick="cambiarVersion(6)" aria-pressed="false">Infinix 6 🔥</button>
-            </nav>
         </header>
 
-        <!-- Panel de estadísticas (aside) - accesible y separado del main -->
-        <aside class="stats-panel" role="complementary" aria-label="Estadísticas">
-            <div class="stat-item">
-                <span class="stat-value" id="messageCount">0</span>
-                <span>Mensajes</span>
+        <!-- ÁREA PRINCIPAL (Chat) -->
+        <main class="chat-area">
+            <!-- Bienvenida inicial -->
+            <div id="welcomeArea" class="welcome-area">
+                <div class="welcome-container">
+                    <h2>Infinix AI</h2>
+                    <p>Conversación inteligente con personalidad configurable</p>
+                    <div class="quick-commands">
+                        <button class="quick-cmd" onclick="sendMessage()">Hola</button>
+                        <button class="quick-cmd" onclick="document.getElementById('userInput').value = 'Cambiar personalidad a friendly'; sendMessage();">Amigable</button>
+                        <button class="quick-cmd" onclick="document.getElementById('userInput').value = '2+2'; sendMessage();">Matemáticas</button>
+                        <button class="quick-cmd" onclick="document.getElementById('userInput').value = 'Código en JavaScript'; sendMessage();">Código</button>
+                    </div>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-value" id="calcCount">0</span>
-                <span>Cálculos</span>
+
+            <!-- Contenedor de mensajes (scroll) -->
+            <div id="chatContainer" class="messages-container" role="main" aria-live="polite" aria-label="Chat">
             </div>
-            <div class="stat-item">
-                <span class="stat-value" id="versionLabel">Infinix 4</span>
-                <span>Versión</span>
+
+            <!-- Indicador de escritura -->
+            <div id="typingIndicator" class="typing-indicator hidden">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </main>
+
+        <!-- FOOTER (Input de texto) -->
+        <footer class="chat-footer">
+            <div class="input-container">
+                <form id="messageForm" onsubmit="handleSubmit(event)">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="userInput" 
+                            class="message-input" 
+                            placeholder="Escribe tu mensaje aquí... (Shift+Enter para salto de línea)"
+                            aria-label="Campo de entrada"
+                            autocomplete="off"
+                            rows="1"></textarea>
+                        <button type="submit" class="send-btn" aria-label="Enviar mensaje" title="Enviar">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 L4.13399899,1.16151496 C3.34915502,0.9 2.40734225,0.9 1.77946707,1.4 C0.994623095,2.0636533 0.837654326,3.1 1.15159189,3.99 L3.03521743,10.4310031 C3.03521743,10.5881005 3.19218622,10.7451979 3.50612381,10.7451979 L16.6915026,11.5306849 C16.6915026,11.5306849 17.1624089,11.5306849 17.1624089,12.0006428 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+                <div class="input-info">
+                    <small>Presiona Ctrl+Enter para enviar</small>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Panel lateral de configuración (oculto por defecto) -->
+        <aside id="settingsPanel" class="settings-panel hidden">
+            <div class="settings-header">
+                <h3>Configuración</h3>
+                <button class="close-btn" onclick="document.getElementById('settingsPanel').classList.add('hidden')">✕</button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-group">
+                    <label>Personalidad</label>
+                    <select id="personalitySelect" onchange="cambiarPersonalidad(this.value)">
+                        <option value="neutral">Neutral</option>
+                        <option value="friendly">Amigable</option>
+                        <option value="sarcastic">Sarcástica</option>
+                        <option value="academic">Académica</option>
+                        <option value="chaotic">Caótica</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Versión de IA</label>
+                    <select id="versionSelect" onchange="cambiarVersion(this.value)">
+                        <option value="4">Infinix 4</option>
+                        <option value="5">Fanix 5</option>
+                        <option value="6">Infinix 6</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Tu apodo</label>
+                    <div class="nickname-input">
+                        <input type="text" id="nicknameInput" placeholder="Deja en blanco para no usar apodo">
+                        <button onclick="establecerApodo()">Guardar</button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <button class="btn-danger" onclick="limpiarChat()">Limpiar Chat</button>
+                </div>
             </div>
         </aside>
+    </div>
 
-        <!-- Temporizador de prueba -->
-        <div class="trial-timer" id="trialTimer" role="timer" aria-live="polite">
-            ⏱️ Prueba: <span id="timeRemaining">10:00</span> restantes
+    <!-- Modal de gráficas -->
+    <div id="graphModal" class="modal hidden" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal('graphModal')">✕</button>
+            <h2>Graficar función</h2>
+            <div class="graph-controls">
+                <input id="graphExpr" type="text" placeholder="f(x) = x^2" />
+                <button onclick="graficarFuncion()">Graficar</button>
+            </div>
+            <canvas id="graphCanvas" width="600" height="400"></canvas>
         </div>
+    </div>
 
-        <!-- Barra de herramientas matemáticas -->
-        <nav class="math-toolbar" role="toolbar" aria-label="Herramientas matemáticas">
-            <button class="tool-btn" onclick="insertarFuncion('√(')" aria-label="Raíz cuadrada">√</button>
-            <button class="tool-btn" onclick="insertarFuncion('sin(')" aria-label="Seno">sin</button>
-            <button class="tool-btn" onclick="insertarFuncion('cos(')" aria-label="Coseno">cos</button>
-            <button class="tool-btn" onclick="insertarFuncion('tan(')" aria-label="Tangente">tan</button>
-            <button class="tool-btn" onclick="insertarFuncion('log(')" aria-label="Logaritmo">log</button>
-            <button class="tool-btn" onclick="insertarFuncion('ln(')" aria-label="Logaritmo natural">ln</button>
-            <button class="tool-btn" onclick="insertarFuncion('^')" aria-label="Potencia">xⁿ</button>
-            <button class="tool-btn" onclick="insertarFuncion('π')" aria-label="Pi">π</button>
-            <button class="tool-btn" onclick="limpiarChat()" aria-label="Limpiar chat">🗑️</button>
-        </nav>
+    <!-- Modal de código -->
+    <div id="codeModal" class="modal hidden" role="dialog" aria-hidden="true">
+        <div class="modal-content code-modal-content">
+            <button class="modal-close" onclick="cerrarModal('codeModal')">✕</button>
+            <div class="code-header">
+                <h2 id="codeLang">Código</h2>
+                <button class="copy-btn" onclick="copiarCodigo()">📋 Copiar</button>
+            </div>
+            <pre><code id="codeBlock" class="code-block"></code></pre>
+        </div>
+    </div>
 
-        <!-- Contenedor de chat (main) -->
-        <main class="chat-container" id="chatContainer" role="main" aria-live="polite" aria-label="Área de chat"></main>
+    <!-- Scripts en orden correcto de carga -->
+    <!-- 1. Core -->
+    <script src="js/config.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/personality.js"></script>
+    <script src="js/language_analyzer.js"></script>
+    
+    <!-- 2. Sistemas avanzados -->
+    <script src="js/plugins_system.js"></script>
+    <script src="js/user_profiles.js"></script>
+    <script src="js/rules_engine.js"></script>
+    <script src="js/learning_system.js"></script>
+    
+    <!-- 3. IA y generación de código -->
+    <script src="js/ai_engine.js"></script>
+    <script src="js/code_generator.js"></script>
+    
+    <!-- 4. Debug y orquestador principal -->
+    <script src="js/debug_panel.js"></script>
+    <script src="js/script.js"></script>
+
+    <!-- Inicialización cuando DOM está listo -->
+    <script>
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarApp);
+        } else {
+            inicializarApp();
+        }
+        
+        // Atajos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                sendMessage();
+            }
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                DebugPanel?.toggle?.();
+            }
+        });
+    </script>
+</body>
+</html>
 
         <!-- Área de entrada (footer) - formulario accesible -->
         <footer class="input-area" role="contentinfo" aria-label="Área de entrada">

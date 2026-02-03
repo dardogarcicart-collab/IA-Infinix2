@@ -66,7 +66,10 @@ const elementos = {
     loadingScreen: null,
     mainInterface: null,
     chatContainer: null,
+    messagesContainer: null,
     userInput: null,
+    messageForm: null,
+    sendBtn: null,
     messageCount: null,
     calcCount: null,
     versionLabel: null,
@@ -74,29 +77,59 @@ const elementos = {
     aiEngine: null,
     trialTimer: null,
     timeRemaining: null,
-    versionButtons: null
+    versionButtons: null,
+    toggleTheme: null,
+    settingsBtn: null,
+    settingsPanel: null,
+    personalitySelect: null,
+    personalityBadge: null,
+    nicknameInput: null,
+    typingIndicator: null,
+    welcomeArea: null
 };
 
 // ===== Inicialización =====
 function inicializarApp() {
-    // Cachear elementos del DOM
+    // Cachear elementos del DOM - estructura nueva ChatGPT
     elementos.loadingScreen = document.getElementById('loading-screen');
     elementos.mainInterface = document.getElementById('main-interface');
     elementos.chatContainer = document.getElementById('chatContainer');
+    elementos.messagesContainer = document.getElementById('chatContainer');
     elementos.userInput = document.getElementById('userInput');
-    elementos.messageCount = document.getElementById('messageCount');
-    elementos.calcCount = document.getElementById('calcCount');
-    elementos.versionLabel = document.getElementById('versionLabel');
-    elementos.aiName = document.getElementById('aiName');
-    elementos.aiEngine = document.getElementById('aiEngine');
-    elementos.trialTimer = document.getElementById('trialTimer');
-    elementos.timeRemaining = document.getElementById('timeRemaining');
-    elementos.versionButtons = document.querySelectorAll('.version-btn');
-
-    // Theme & history buttons
+    elementos.messageForm = document.getElementById('messageForm');
+    elementos.sendBtn = document.querySelector('.send-btn');
     elementos.toggleTheme = document.getElementById('toggleTheme');
-    elementos.openHistory = document.getElementById('openHistory');
-    elementos.historyPanel = null;
+    elementos.settingsBtn = document.getElementById('settingsBtn');
+    elementos.settingsPanel = document.getElementById('settingsPanel');
+    elementos.personalitySelect = document.getElementById('personalitySelect');
+    elementos.personalityBadge = document.getElementById('personalityBadge');
+    elementos.nicknameInput = document.getElementById('nicknameInput');
+    elementos.typingIndicator = document.getElementById('typingIndicator');
+    elementos.welcomeArea = document.getElementById('welcomeArea');
+    
+    // Elementos obsoletos que ahora no existen pero evitamos errores
+    elementos.messageCount = null;
+    elementos.calcCount = null;
+    elementos.versionLabel = null;
+    elementos.aiName = null;
+    elementos.aiEngine = null;
+    elementos.trialTimer = null;
+    elementos.timeRemaining = null;
+    elementos.versionButtons = null;
+
+    // Cargar preferencias de tema
+    cargarTema();
+    
+    // Ocultar pantalla de carga después de 1500ms
+    setTimeout(() => {
+        if (elementos.loadingScreen) {
+            elementos.loadingScreen.style.opacity = '0';
+            elementos.loadingScreen.style.pointerEvents = 'none';
+            setTimeout(() => {
+                elementos.loadingScreen.style.display = 'none';
+            }, 300);
+        }
+    }, 1500);
 
     // ===== Integración de nuevos sistemas =====
     
@@ -137,110 +170,67 @@ function inicializarApp() {
         });
     }
 
-    // Event listeners
-    elementos.userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    // Shortcuts: Ctrl+L limpiar, Ctrl+H historial
-    document.addEventListener('keydown', (e)=>{
-        if (e.ctrlKey && e.key.toLowerCase() === 'l'){
-            e.preventDefault(); limpiarChat();
-        }
-        if (e.ctrlKey && e.key.toLowerCase() === 'h'){
-            e.preventDefault(); toggleHistory();
-        }
-    });
+    // Event listeners - Actualizar para el nuevo HTML
+    if (elementos.messageForm) {
+        elementos.messageForm.addEventListener('submit', handleSubmit);
+    }
+    
+    if (elementos.userInput) {
+        elementos.userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+            if (e.ctrlKey && e.key === 'Enter') {
+                sendMessage();
+            }
+            // Auto-resize textarea
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+        });
+    }
 
     // Theme toggle
-    if (elementos.toggleTheme) elementos.toggleTheme.addEventListener('click', ()=>{ toggleTheme(); });
-    if (elementos.openHistory) elementos.openHistory.addEventListener('click', ()=>{ toggleHistory(); });
+    if (elementos.toggleTheme) {
+        elementos.toggleTheme.addEventListener('click', toggleTema);
+    }
+    
+    // Settings
+    if (elementos.settingsBtn) {
+        elementos.settingsBtn.addEventListener('click', () => {
+            elementos.settingsPanel?.classList.toggle('hidden');
+        });
+    }
+    
+    // Personalidad select
+    if (elementos.personalitySelect) {
+        elementos.personalitySelect.addEventListener('change', (e) => {
+            cambiarPersonalidad(e.target.value);
+        });
+    }
 
-    // Apply saved theme
-    initTheme();
-
-    // Render history panel container
-    elementos.historyPanel = document.createElement('div');
-    elementos.historyPanel.id = 'historyPanel';
-    document.body.appendChild(elementos.historyPanel);
-    renderHistory();
-
-    // Handlers para modal de código (si CodeGenerator está disponible)
-    const codeModal = document.getElementById('codeModal');
-    const closeCodeBtn = document.getElementById('closeCode');
-    const copyCodeBtn = document.getElementById('copyCodeBtn');
-    if (closeCodeBtn) closeCodeBtn.addEventListener('click', ()=>{ codeModal.setAttribute('aria-hidden','true'); });
-    if (copyCodeBtn) copyCodeBtn.addEventListener('click', ()=>{ 
-        const code = document.getElementById('codeBlock').textContent;
-        navigator.clipboard.writeText(code).then(()=>{ alert('Código copiado al portapapeles'); }).catch(e=> console.error(e));
+    // Shortcuts: Ctrl+L limpiar
+    document.addEventListener('keydown', (e)=>{
+        if (e.ctrlKey && e.key.toLowerCase() === 'l'){
+            e.preventDefault(); 
+            limpiarChat();
+        }
+        if (e.ctrlKey && e.key.toLowerCase() === 'd'){
+            e.preventDefault();
+            DebugPanel?.toggle?.();
+        }
     });
-    // Escuchar si hay código generado y mostrar modal automáticamente
-    const originalReveal = revealTyping;
-    window.revealTyping = async function(typingDiv, text, analysis){
-        // si contiene bloque de código, extraerlo y mostrar en modal
-        const codeMatch = text.match(/```(\w+)\n([\s\S]*?)\n```/);
-        if (codeMatch){
-            const lang = codeMatch[1];
-            const code = codeMatch[2];
-            document.getElementById('codeLang').textContent = 'Código: ' + lang.toUpperCase();
-            document.getElementById('codeBlock').textContent = code;
-            codeModal.setAttribute('aria-hidden','false');
-            // remover bloque de código del texto para no mostrar en chat
-            text = text.replace(/```\w+\n[\s\S]*?\n```\n\n/, '');
+    
+    // Cargar personalidad guardada
+    if (typeof Personality !== 'undefined') {
+        const personalidadGuardada = Personality.getPersonality();
+        if (elementos.personalityBadge) {
+            elementos.personalityBadge.textContent = personalidadGuardada || 'neutral';
         }
-        return originalReveal.call(this, typingDiv, text, analysis);
-    };
-
-    // Mostrar interfaz después de cargar
-    setTimeout(() => {
-        elementos.loadingScreen.classList.add('hidden');
-        elementos.mainInterface.classList.add('visible');
-        
-        const palabra = obtenerPalabraAleatoria();
-        const nick = Personality?.getNickname?.();
-        const saludo = nick ? `${palabra}, ${nick}!` : `${palabra}!`;
-        addMessage(
-            `${saludo} Soy Infinix-4, tu IA más avanzada.\n\n` +
-            `📊 Matemáticas | ⚛️ Física | 🧪 Química | 💻 Programación\n\n` +
-            `¿En qué puedo ayudarte?`,
-            'ai'
-        );
-    }, CONFIG.LOADING_DURATION);
-}
-
-// Manejar comandos de usuario directos (apodo, personalidad, memoria)
-function handleUserCommands(text){
-    const lower = text.toLowerCase();
-    // llámame X  -> establecer apodo
-    const match = lower.match(/ll(?:á|a)mame\s+([\w\-]+)/i);
-    if (match){
-        const nick = match[1];
-        Personality.setNickname(nick);
-        addMessage(`Listo — te llamaré ${nick} a partir de ahora.`, 'system');
-        return true;
-    }
-    if (/olvida mi apodo|olvida mi apodo|borra mi apodo/i.test(lower)){
-        Personality.forgetNickname();
-        addMessage('He olvidado tu apodo.', 'system');
-        return true;
-    }
-    // cambiar personalidad a X
-    const pMatch = lower.match(/cambiar personalidad (?:a )?([a-z]+)/i) || lower.match(/set persona to ([a-z]+)/i);
-    if (pMatch){
-        const p = pMatch[1];
-        if (Personality.setPersonality(p)){
-            addMessage(`Personalidad cambiada a ${p}.`, 'system');
-        } else {
-            addMessage(`Personalidad desconocida. Opciones: ${Personality.listPersonalities().join(', ')}`, 'system');
+        if (elementos.personalitySelect) {
+            elementos.personalitySelect.value = personalidadGuardada || 'neutral';
         }
-        return true;
     }
-    if (/mostrar memoria|ver memoria|mostrar mi memoria/i.test(lower)){
-        const mem = Personality.getMemory();
-        addMessage(`Memoria: ${JSON.stringify(mem)}`, 'system');
-        return true;
-    }
-    return false;
 }
 
 // ===== Funciones de utilidad =====
@@ -251,10 +241,10 @@ function obtenerPalabraAleatoria() {
 function actualizarContador(tipo) {
     if (tipo === 'mensaje') {
         state.contadorMensajes++;
-        elementos.messageCount.textContent = state.contadorMensajes;
+        // Los contadores numéricos ya no se muestran en el nuevo UI
+        // pero continuamos registrando para compatibilidad
     } else if (tipo === 'calculo') {
         state.contadorCalculos++;
-        elementos.calcCount.textContent = state.contadorCalculos;
     }
 }
 
@@ -265,33 +255,111 @@ function actualizarContador(tipo) {
  * @param {'ai'|'user'|'system'} sender
  */
 function addMessage(text, sender) {
+    // Ocultar área de bienvenida cuando hay mensajes
+    if (elementos.welcomeArea) {
+        elementos.welcomeArea.style.display = 'none';
+    }
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
 
-    if (sender === 'ai') {
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-        avatar.textContent = '🤖';
-        const bubble = document.createElement('div');
-        bubble.className = 'message-bubble';
-        bubble.textContent = text;
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(bubble);
-    } else {
-        const bubble = document.createElement('div');
-        bubble.className = 'message-bubble';
-        bubble.textContent = text;
-        messageDiv.appendChild(bubble);
-    }
-
-    elementos.chatContainer.appendChild(messageDiv);
-    elementos.chatContainer.scrollTop = elementos.chatContainer.scrollHeight;
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.innerHTML = escapeHtml(text);
+    
+    messageDiv.appendChild(content);
+    
+    elementos.messagesContainer.appendChild(messageDiv);
+    
+    // Auto-scroll al último mensaje
+    setTimeout(() => {
+        elementos.messagesContainer.scrollTop = elementos.messagesContainer.scrollHeight;
+    }, 50);
 }
 
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ===== Manejo de formulario =====
+function handleSubmit(e) {
+    e.preventDefault();
+    sendMessage();
+}
+
+// ===== Tema (Light/Dark) =====
+function cargarTema() {
+    const temGuardado = localStorage.getItem('infinix-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', temGuardado);
+}
+
+function toggleTema() {
+    const temaActual = document.documentElement.getAttribute('data-theme');
+    const nuevoTema = temaActual === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', nuevoTema);
+    localStorage.setItem('infinix-theme', nuevoTema);
+}
+
+// ===== Personalidad =====
+function cambiarPersonalidad(persona) {
+    if (typeof Personality !== 'undefined') {
+        Personality.setPersonalidad(persona);
+        state.personality = persona;
+        if (elementos.personalityBadge) {
+            elementos.personalityBadge.textContent = persona;
+        }
+        addMessage(`Personalidad cambiada a: ${persona} ✅`, 'system');
+    }
+}
+
+// ===== Apodo =====
+function establecerApodo() {
+    const apodo = elementos.nicknameInput?.value || '';
+    if (typeof Personality !== 'undefined') {
+        if (apodo.trim()) {
+            Personality.setNickname(apodo);
+            addMessage(`Apodo guardado: ${apodo} ✅`, 'system');
+            elementos.nicknameInput.value = '';
+        } else {
+            addMessage('Apodo cancelado.', 'system');
+        }
+    }
+}
+
+// ===== Versión (compatible) =====
+function cambiarVersion(v) {
+    // v = 3, 4, 5, 6
+    addMessage(`Cambiando a versión ${v}...`, 'system');
+    state.versionActual = v;
+}
+
+// ===== Graficar =====
+function graficarFuncion() {
+    const expr = document.getElementById('graphExpr')?.value || '';
+    if (!expr) {
+        addMessage('Por favor ingresa una expresión.', 'system');
+        return;
+    }
+    document.getElementById('graphModal')?.classList.remove('hidden');
+    // Lógica de graficación existente
+    // ... (aquí iría el código de Canvas)
+}
+
+// ===== Modal =====
+function cerrarModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+function copiarCodigo() {
+    const code = document.getElementById('codeBlock')?.textContent || '';
+    navigator.clipboard.writeText(code).then(() => {
+        addMessage('Código copiado ✅', 'system');
+    });
 }
 
 /**
@@ -459,6 +527,7 @@ function sendMessage() {
         if (state.infinix6Mensajes >= CONFIG.INFINIX6_MESSAGE_LIMIT) {
             addMessage(mensaje, 'user');
             elementos.userInput.value = '';
+            elementos.userInput.style.height = 'auto';
             setTimeout(() => {
                 addMessage('Límite de 3 mensajes alcanzado 🔒', 'system');
                 finalizarPruebaInfinix6();
@@ -470,7 +539,22 @@ function sendMessage() {
     // Añadir mensaje de usuario y limpiar input
     addMessage(mensaje, 'user');
     elementos.userInput.value = '';
+    elementos.userInput.style.height = 'auto';
+    
+    // Desactivar input durante respuesta
+    if (elementos.sendBtn) {
+        elementos.sendBtn.disabled = true;
+    }
+    if (elementos.userInput) {
+        elementos.userInput.disabled = true;
+    }
+    
     actualizarContador('mensaje');
+
+    // Mostrar indicador de escritura
+    if (elementos.typingIndicator) {
+        elementos.typingIndicator.classList.remove('hidden');
+    }
 
     // Pipeline avanzado: analizar, pensar con delay dinámico, mostrar indicador y luego responder
     processUserMessage(mensaje);
@@ -637,31 +721,59 @@ function computeThinkingDelay(analysis){
 
 /** Añade un bubble temporal de "typing" y lo retorna */
 function addTypingBubble(){
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message ai typing';
-    const avatar = document.createElement('div'); avatar.className='avatar'; avatar.textContent='🤖';
-    const bubble = document.createElement('div'); bubble.className='message-bubble'; bubble.textContent = 'pensando...';
-    messageDiv.appendChild(avatar); messageDiv.appendChild(bubble);
-    elementos.chatContainer.appendChild(messageDiv);
-    elementos.chatContainer.scrollTop = elementos.chatContainer.scrollHeight;
-    return messageDiv;
+    // Usar el indicador de escritura del nuevo HTML
+    if (elementos.typingIndicator) {
+        elementos.typingIndicator.classList.remove('hidden');
+    }
+    // Retornar un placeholder para compatibilidad
+    return {
+        classList: { add: () => {}, remove: () => {} },
+        querySelector: () => ({ textContent: '' })
+    };
 }
 
 /** Revela texto en el bubble simulando tipeo humano; devuelve Promise cuando termina */
 function revealTyping(typingDiv, text, analysis){
     return new Promise((resolve)=>{
-        const bubble = typingDiv.querySelector('.message-bubble');
-        bubble.textContent = '';
+        // Ocultar indicador de escritura
+        if (elementos.typingIndicator) {
+            elementos.typingIndicator.classList.add('hidden');
+        }
+        
+        // Crear nuevo mensaje de AI
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ai';
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = '';
+        
+        messageDiv.appendChild(content);
+        elementos.messagesContainer.appendChild(messageDiv);
+        elementos.messagesContainer.scrollTop = elementos.messagesContainer.scrollHeight;
+        
         const energy = state.energiaIA || 0.8;
         // velocidad en ms por carácter (menor = más rápido)
         const baseSpeed = 30; // ms per char
         const speed = Math.max(8, Math.round(baseSpeed * (1.2 - energy) + (Math.random()*20 -10)));
         let i = 0;
+        
         // ocasionalmente introducir micro hesitaciones
         function step(){
-            if (i >= text.length){ resolve(); return; }
-            bubble.textContent += text[i++];
-            elementos.chatContainer.scrollTop = elementos.chatContainer.scrollHeight;
+            if (i >= text.length){ 
+                // Rehabilitar input después de respuesta
+                if (elementos.sendBtn) {
+                    elementos.sendBtn.disabled = false;
+                }
+                if (elementos.userInput) {
+                    elementos.userInput.disabled = false;
+                    elementos.userInput.focus();
+                }
+                resolve(); 
+                return; 
+            }
+            content.textContent += text[i++];
+            elementos.messagesContainer.scrollTop = elementos.messagesContainer.scrollHeight;
             // small pause on punctuation
             const ch = text[i-1];
             let delay = speed;
@@ -1304,7 +1416,15 @@ function drawGraph(canvas, expr, xmin=-10, xmax=10, ymin=null, ymax=null){
 }
 
 function limpiarChat() {
-    elementos.chatContainer.innerHTML = '';
+    if (elementos.messagesContainer) {
+        elementos.messagesContainer.innerHTML = '';
+    }
+    
+    // Mostrar área de bienvenida nuevamente
+    if (elementos.welcomeArea) {
+        elementos.welcomeArea.style.display = 'flex';
+    }
+    
     const palabra = obtenerPalabraAleatoria();
     addMessage(`${palabra}! Chat limpio. ¿En qué puedo ayudarte?`, 'ai');
 }
