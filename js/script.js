@@ -925,11 +925,16 @@ function generarRespuesta(mensaje) {
     // registrar en memoria corta
     memoryAdd({type:'user', text:mensaje, when: Date.now()});
     
+    // 💡 NUEVO: Analizar mensaje con Sistema de Ideas
+    const ideasEncontradas = typeof IdeasSystem !== 'undefined' ? 
+        IdeasSystem.analizarMensaje(mensaje) : [];
+    
     // Registrar en logger del sistema
     if (typeof Logger !== 'undefined'){
         Logger.info('Generating response', {
             messageLength: mensaje.length,
-            complexity: analyzeMessage(mensaje).complexity
+            complexity: analyzeMessage(mensaje).complexity,
+            ideasEncontradas: ideasEncontradas.length
         });
     }
 
@@ -969,7 +974,11 @@ function generarRespuesta(mensaje) {
     const resultadoMat = evaluarMatematica(mensaje);
     if (resultadoMat) {
         const explicacion = explainCalculation(mensaje);
-        const base = resultadoMat + '\n\n' + explicacion;
+        let base = resultadoMat + '\n\n' + explicacion;
+        // 💡 Enriquecer con ideas si existen
+        if (typeof IdeasSystem !== 'undefined' && ideasEncontradas.length > 0) {
+            base = IdeasSystem.enriquecerRespuesta(base, ideasEncontradas);
+        }
         const style = chooseResponseStyle(mensaje);
         return applyPersonality(applyStyle(base, style), state.personality);
     }
@@ -982,6 +991,12 @@ function generarRespuesta(mensaje) {
     const style = chooseResponseStyle(mensaje);
     // elegir candidato por prioridad simple: prefer respuestas que contengan una keyword
     let chosen = candidates.find(c=> c.toLowerCase().includes(bestKeyword(mensaje))) || candidates[0];
+    
+    // 💡 Enriquecer respuesta con ideas si están disponibles
+    if (typeof IdeasSystem !== 'undefined' && ideasEncontradas.length > 0) {
+        chosen = IdeasSystem.enriquecerRespuesta(chosen, ideasEncontradas);
+    }
+    
     // aplicar estilo y personalidad
     const final = applyPersonality(applyStyle(chosen, style), state.personality);
     return final;
